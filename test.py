@@ -42,7 +42,7 @@ def fun():
         if stack1.top == -1 and stack2.top == 0:
             stack1.push(x)
         else:
-            if x in '1234567890':
+            if x.isdigit()==1:
                 stack2.push(x)
             else:
                 t = stack1.pop()
@@ -79,7 +79,7 @@ def count():
     print("后缀表达式计算栈stack3为：{}".format(stack3.s))
     t = stack3.pop()
     while t != 'q':
-        if t in '1234567890':
+        if t.isdigit==1:
             stack4.push(t)
         else:
             if t == '+':
