@@ -66,6 +66,36 @@ def fun():
         if x == 'q':
             for i in range(stack1.top+1):
                 stack2.push(stack1.pop())
+            stack2.push('q')
             break
-    return stack2.s
-                    
+    print("后缀表达式栈stack2为：{}".format(stack2.s))
+    return stack2
+def count():
+    stack2= fun()
+    stack3=stack(stack2.top+1,'stack3')
+    stack4 = stack(stack2.top+1,'stack4')
+    while stack2.top != -1:
+        stack3.push(stack2.pop())
+    print("后缀表达式计算栈stack3为：{}".format(stack3.s))
+    t = stack3.pop()
+    while t != 'q':
+        if t in '1234567890':
+            stack4.push(t)
+        else:
+            if t == '+':
+                stack4.push(int(stack4.pop())+int(stack4.pop()))
+            elif t == '-':
+                stack4.push(int(stack4.pop())-int(stack4.pop()))
+            elif t == '*':
+                stack4.push(int(stack4.pop())*int(stack4.pop()))
+            elif t == '/':
+                stack4.push(int(stack4.pop())/int(stack4.pop()))
+        t = stack3.pop()
+    print(stack4.s)
+    
+
+if __name__ == '__main__':
+    count()
+                
+        
+    
