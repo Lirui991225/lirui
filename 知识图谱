@@ -1,0 +1,280 @@
+#船员信息表
+create table kg_role_info (name varchar2(20),age number,birth_address varchar2(200),target varchar2(2000))
+name :姓名
+age :年龄
+birth_address:出生地
+target:目标
+
+
+#海贼团成员表
+create table kg_hzt_info (hzt_name varchar2(200),member_name varchar2(20),role_name  varchar2(20))
+hzt_name:海贼团名称
+member_name:成员姓名
+role_name:角色
+#插入数据
+
+insert into kg_role_info (NAME, AGE, BIRTH_ADDRESS, TARGET)
+values ('蒙奇·D·路飞', 19, '东海-哥亚王国-风车镇', '海贼王');
+
+insert into kg_role_info (NAME, AGE, BIRTH_ADDRESS, TARGET)
+values ('罗罗诺亚·索隆', 21, '东海-霜月村', '世界第一的大剑豪');
+
+insert into kg_role_info (NAME, AGE, BIRTH_ADDRESS, TARGET)
+values ('娜美', 20, '东海-可可亚西村', '绘制世界地图');
+
+insert into kg_role_info (NAME, AGE, BIRTH_ADDRESS, TARGET)
+values ('乌索普', 19, '东海-西罗普村', '勇敢的海上战士');
+
+insert into kg_role_info (NAME, AGE, BIRTH_ADDRESS, TARGET)
+values ('文斯莫克·山治', 21, '东海-西罗普村', '找到All Blue');
+
+insert into kg_role_info (NAME, AGE, BIRTH_ADDRESS, TARGET)
+values ('托尼托尼·乔巴', 17, '伟大航路·磁鼓岛-无名国', '制作出"万能药"，帮助所有需要帮助的人');
+
+insert into kg_role_info (NAME, AGE, BIRTH_ADDRESS, TARGET)
+values ('妮可·罗宾', 30, '西海-欧哈拉', '解开历史正文，找到关于三大武器的秘密');
+
+insert into kg_role_info (NAME, AGE, BIRTH_ADDRESS, TARGET)
+values ('弗兰奇', 36, '南海某国', '乘坐自己制作的梦想之船绕伟大航线一周');
+
+insert into kg_role_info (NAME, AGE, BIRTH_ADDRESS, TARGET)
+values ('布鲁克', 99, '西海某国', '与拉布汇合');
+
+insert into kg_role_info (NAME, AGE, BIRTH_ADDRESS, TARGET)
+values ('甚平', 46, '鱼人岛', '帮助路飞成为海贼王，让鱼人族获得真正的自由');
+
+insert into kg_hzt_info (HZT_NAME, MEMBER_NAME, ROLE_NAME)
+values ('草帽海贼团', '蒙奇·D·路飞', '船长');
+
+insert into kg_hzt_info (HZT_NAME, MEMBER_NAME, ROLE_NAME)
+values ('草帽海贼团', '罗罗诺亚·索隆', '副船长');
+
+insert into kg_hzt_info (HZT_NAME, MEMBER_NAME, ROLE_NAME)
+values ('草帽海贼团', '娜美', '航海士');
+
+insert into kg_hzt_info (HZT_NAME, MEMBER_NAME, ROLE_NAME)
+values ('草帽海贼团', '乌索普', '狙击手');
+
+insert into kg_hzt_info (HZT_NAME, MEMBER_NAME, ROLE_NAME)
+values ('草帽海贼团', '文斯莫克·山治', '厨师');
+
+insert into kg_hzt_info (HZT_NAME, MEMBER_NAME, ROLE_NAME)
+values ('草帽海贼团', '托尼托尼·乔巴', '船医');
+
+insert into kg_hzt_info (HZT_NAME, MEMBER_NAME, ROLE_NAME)
+values ('草帽海贼团', '妮可·罗宾', '考古学家');
+
+insert into kg_hzt_info (HZT_NAME, MEMBER_NAME, ROLE_NAME)
+values ('草帽海贼团', '弗兰奇', '船匠');
+
+insert into kg_hzt_info (HZT_NAME, MEMBER_NAME, ROLE_NAME)
+values ('草帽海贼团', '布鲁克', '音乐家');
+
+insert into kg_hzt_info (HZT_NAME, MEMBER_NAME, ROLE_NAME)
+values ('草帽海贼团', '甚平', '舵手');
+#自写Oracle增删改查工具类
+#这里自己封装了一个工具类，方便链接Oracle库，调用一些常用操作，比较简单，大家不要挑剔哈（先为自己的菜鸡找好借口了*）
+
+# -*- coding: utf-8 -*-
+"""
+Created on 2019年11月20日
+
+@作者:gcl_coder
+"""
+import cx_Oracle
+
+
+'''
+重新定义Oracle数据连接库，方便后续调用，不需要每次都复制函数到python脚本里面
+'''
+class Gcl_oracle(object):
+    
+    
+    #实例函数，用于初始化对象，创建的时候必须要将用户名user,密码password和服务名servername放进去，不然无法连接数据库，创建连接会失败
+    def __init__(self,user,password,servername='orcl'):
+        self.user = user
+        self.password = password
+        self.servername = servername
+        
+    
+   #重定义数据库连接
+    def connect(self):
+        return cx_Oracle.connect(self.user, self.password, self.servername,encoding="UTF-8")
+    
+    
+    #定义数据库查询函数，数据数据库连接名connection，查询的sql,返回list类型查询结果
+    '''
+    sql = 'select column1,column2 from tablename'
+    '''
+    def select(self,sql):
+        connection = self.connect()
+        cursor = connection.cursor()
+        results = cursor.execute(sql).fetchall()
+        cursor.close()
+        return results
+        
+    #定义插入Oracle数据函数，输入数据库连接和执行sql,dataToInsert为插入数据，要求数组类型
+    '''
+    dataToInsert = [
+        (10, 'Parent 10'),
+        (20, 'Parent 20'),
+        (30, 'Parent 30'),
+        (40, 'Parent 40'),
+        (50, 'Parent 50')
+    ]
+    cursor.executemany("insert into ParentTable values (:1, :2)", dataToInsert)
+    '''
+    def insert(self,sql,dataToInsert=[]):
+        connection = self.connect()
+        cursor = connection.cursor()
+        cursor.executemany(sql,dataToInsert)
+        connection.commit()
+        cursor.close()
+        
+    #删除数据
+    '''
+    部分删除
+    sql = 'delete from table_name where condition'
+    全表清除建议用以下脚本，大表效率较高
+    sql = 'truncate table tablename'
+	这个也可以用来做数据修改等其他DML操作
+    '''
+    def delete(self,sql):
+        connection = self.connect()
+        cursor = connection.cursor()
+        cursor.execute(sql)
+        connection.commit()
+        cursor.close()    
+
+#知识入库
+
+
+# -*- coding: utf-8 -*-
+"""
+Created on 2019年11月20日
+
+@作者:gcl_coder
+"""
+#导入应用模块
+#import py2neo
+from py2neo import Node, Graph, Relationship,Database,NodeMatcher,data
+#from py2neo.ogm import GraphObject,Property,RelatedFrom,RelatedTo
+import datetime
+#import pandas as pd
+#import numpy as np
+import gcl_oracle
+#import os
+
+'''
+#函数声明
+def add_nodes(graph,node_list,label,primarykey):
+    """
+    说明：向neo4j中添加实体节点
+        参数:graph: 对应neo4j实例
+            node_list:节点列表 type -list
+            label:neo4j对应节点的标签
+            primarykey:neo4j 对应节点的唯一主键
+        返回：NULL
+    """
+    nodes = []
+    #定义事物开始
+    tx = graph.begin()
+    nodes = data.Subgraph(node_list)
+    #merge 按照primarykey创建不重复的节点
+    tx.merge(nodes, label, primarykey)
+    #事物结束，提交数据
+    tx.commit()
+
+def add_nodes_pages(results,key_list,graph,label,primarykey):
+    '''
+    说明：分批次导入节点实体数据
+        参数：results:实体清单list类型(包含实体和实体对应的属性)
+              key_list:实体清单对应的属性名称(字段名称)，和results数据column对齐
+              graph:neo4j连接对象
+              label:neo4j中的标签名(实体类名)，类似数据库中的表名
+              primarykey：实体唯一主键
+    '''
+    #提取列表长度
+    len_res = len(results)
+    #记录开始时间
+    print('start_add_nodes:', datetime.datetime.now())
+    nodes = []
+    #循环迭代，插入知识图谱实体&实体属性
+    for index, c in enumerate(results):
+        #将每条知识和属性名称打包成字典
+        n_properties = dict(zip(key_list, c))
+        #创建节点
+        a = Node(label, **n_properties)
+        #加入数组
+        nodes.append(a)
+        #判断1000条记录入库提交一次
+        if len_res == (index + 1):
+            add_nodes(graph, nodes, label, primarykey)
+            nodes = []
+        elif (index + 1) % 1000 == 0:
+            add_nodes(graph, nodes, label, primarykey)
+            nodes = []
+        else:
+            pass
+    #结束时间打印
+    print('end_add_nodes:', datetime.datetime.now())
+
+    
+#主程序执行入口
+if __name__=='__main__':
+    # 连接neo4j
+    #graph = Graph("http://10.73.241.109:7474/", username="neo4j", password="neo4j")
+    graph = Graph("http://localhost:7474/browser/", username="neo4j", password="neo4j")
+    print('graph 连接成功，开始清库')
+    #清除neo4j库里面的数据数据量太大的时候不能用以下清表函数，容易卡住，建议直接通过后台服务删除文件
+    graph.delete_all()
+    print('graph 清库成功')
+    #连接oracle,将username换成你的数据库账号，password是密码，server是服务
+    gcl_ora = gcl_oracle.Gcl_oracle('username','password','server')
+    conn = gcl_ora.connect()
+
+    '''
+    知识的导入我这边总结了一下主要分为两步：1.创建实体；2.创建实体之间的关系 ；传说中的三元组也没有那么高深嘛
+    创建实体的时候属性可以按照自己的需求添加，比如下面的Person实体，name以外的都是属性
+    提示：其实每个属性都可以成为实体，具体看自己的需求和设计，总体知识我觉得做到清晰的说明事物时间的关系即可，不是越复杂越好
+    '''
+    # 第一步添加实体：为了演示我们添加2个实体类
+    # 添加海贼团实体 Pirate_regiment 类
+    graph.run("MERGE (n:Pirate_regiment{name:'草帽海贼团'})")
+
+    # 添加Person实体
+    quary_sql = 'select name,age,birth_address,target from kg_role_info'
+    results = gcl_ora.select(quary_sql)
+    '''
+    这里有个细节需要注意一下，neo4j实体默认显示的是属性为name的字段，如果你的表中没有name这个字段，
+    也没关系，只要在下面的key_list中将对应顺序的字段命名为name就可以,字段名称最好都小写，neo4j是区分大小写的，这个坑我踩过
+    '''
+    key_list = ['name', 'age', 'birth_address', 'target']
+    #调用分片函数导入知识
+    add_nodes_pages(results, key_list, graph, 'Person', 'name')
+
+
+    # 添加出生地实体Birth_address
+    quary_sql = 'select birth_address from kg_role_info'
+    results = gcl_ora.select(quary_sql)
+    key_list = ['name']
+    add_nodes_pages(results, key_list, graph, 'Birth_address', 'name')
+
+
+    #第二步：创建关系，创建关系我这边列举了两种方式
+    #批量创建：如果两个实体之间的可以通过属性关联创建的，如案例中的Person类中的birth_address和Birth_address类中的name可以直接关联产生连接
+    #这个方式相对效率会很高，适合较大数据量，具体如下：
+    graph.run("MATCH (p:Person),(u:Birth_address) WHERE p.birth_address = u.name merge (p)-[:出生于]->(u)")
+
+
+    #单条创建：这个适合实体时间的关系无法直接通过关联产生，需要人为设定关系，相对效率较低，具体实现如下：
+    results_user = gcl_ora.select('select hzt_name,member_name,role_name from kg_hzt_info')
+    for r in results_user:
+        start = str(r[0])#hzt_name  海贼团名称
+        end = str(r[1])#member_name 成员姓名
+        rel = str(r[2])#role_name 成员角色
+        if start is None:
+            pass
+        else:
+            cql_str = 'match (n: Pirate_regiment {name: \'' + start + '\'}),(m: Person {name: \'' + end + '\'}) MERGE (n)-[r:' + rel + ']->(m)'
+            graph.run(cql_str)
